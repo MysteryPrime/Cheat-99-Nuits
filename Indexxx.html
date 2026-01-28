@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>99 Nuits — Outil Officiel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    :root {
+        --bg: #050509;
+        --bg-alt: #0b0b12;
+        --accent: #00f5ff;
+        --accent-soft: rgba(0,245,255,0.2);
+        --accent-strong: #ff00ff;
+        --text-main: #f5f5f5;
+        --text-muted: #9a9aaf;
+        --card-bg: #10101a;
+        --border-soft: rgba(255,255,255,0.06);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #151528 0, #050509 55%);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* --- Background FX --- */
+    .bg-orbit {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -2;
+        background:
+            radial-gradient(circle at 10% 20%, rgba(0,245,255,0.12) 0, transparent 55%),
+            radial-gradient(circle at 90% 80%, rgba(255,0,255,0.12) 0, transparent 55%);
+        filter: blur(2px);
+    }
+
+    .scanline {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
+        background-image: linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.04) 1px,
+            transparent 1px
+        );
+        background-size: 100% 2px;
+        mix-blend-mode: soft-light;
+        opacity: 0.25;
+    }
+
+    header {
+        padding: 18px 7vw;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border-soft);
+        backdrop-filter: blur(14px);
+        background: linear-gradient(to right, rgba(5,5,12,0.9), rgba(5,5,12,0.6));
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .brand-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: conic-gradient(from 140deg, #00f5ff, #ff00ff, #00f5ff);
+        box-shadow: 0 0 18px rgba(0,245,255,0.7);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .brand-mark::after {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-radius: 8px;
+        background: #050509;
+    }
+
+    .brand-text-main {
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .brand-text-sub {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.18em;
+    }
+
+    .nav-pill {
+        border-radius: 999px;
+        border: 1px solid var(--border-soft);
+        padding: 6px 14px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(5,5,12,0.8);
+    }
+
+    .nav-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #00ff9d;
+        box-shadow: 0 0 10px #00ff9d;
+    }
+
+    main {
+        flex: 1;
+        padding: 40px 7vw 60px;
+        max-width: 1120px;
+        margin: 0 auto;
+    }
+
+    .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
+        gap: 40px;
+        align-items: center;
+        margin-bottom: 50px;
+    }
+
+    @media (max-width: 900px) {
+        .hero {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .hero-kicker {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: var(--accent);
+        margin-bottom: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .hero-kicker::before {
+        content: "";
+        width: 26px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--accent));
+        opacity: 0.8;
+    }
+
+    .hero-title {
+        font-size: clamp(2.4rem, 4vw, 3.2rem);
+        line-height: 1.1;
+        margin-bottom: 14px;
+    }
+
+    .hero-title span {
+        background: linear-gradient(120deg, #00f5ff, #ff00ff);
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 18px rgba(0,245,255,0.5);
+    }
+
+    .hero-subtitle {
+        font-size: 0.98rem;
+        color: var(--text-muted);
+        max-width: 460px;
+        margin-bottom: 24px;
+    }
+
+    .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 26px;
+    }
+
+    .meta-pill {
+        border-radius: 999px;
+        border: 1px solid var(--border-soft);
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(10,10,18,0.9);
+    }
+
+    .meta-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--accent);
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+    }
+
+    .btn-primary {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 13px 26px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #050509;
+        background: linear-gradient(120deg, #00f5ff, #ff00ff);
+        box-shadow:
+            0 0 18px rgba(0,245,255,0.6),
+            0 0 32px rgba(255,0,255,0.4);
+        text-decoration: none;
+        overflow: hidden;
+    }
+
+    .btn-primary::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(255,255,255,0.18), transparent 60%);
+        opacity: 0;
+        transform: translateX(-40%);
+        transition: 0.35s ease;
+    }
+
+    .btn-primary:hover::before {
+        opacity: 1;
+        transform: translateX(40%);
+    }
+
+    .btn-primary span.icon {
+        font-size: 1.1rem;
+    }
+
+    .btn-ghost {
+        border-radius: 999px;
+        border: 1px solid var(--border-soft);
+        padding: 11px 20px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-muted);
+        background: rgba(5,5,12,0.85);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-ghost-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #ffaa00;
+        box-shadow: 0 0 10px #ffaa00;
+    }
+
+    .hero-right {
+        position: relative;
+    }
+
+    .panel {
+        border-radius: 18px;
+        border: 1px solid var(--border-soft);
+        background: radial-gradient(circle at top left, rgba(0,245,255,0.12), transparent 55%),
+                    radial-gradient(circle at bottom right, rgba(255,0,255,0.12), transparent 55%),
+                    var(--card-bg);
+        padding: 20px 18px 18px;
+        box-shadow:
+            0 0 30px rgba(0,0,0,0.7),
+            0 0 40px rgba(0,245,255,0.18);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .panel-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .panel-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: #ff5f57;
+    }
+
+    .panel-dot:nth-child(2) { background: #febc2e; }
+    .panel-dot:nth-child(3) { background: #28c840; }
+
+    .panel-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--text-muted);
+    }
+
+    .panel-body {
+        font-family: "JetBrains Mono", "Fira Code", monospace;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        background: rgba(3,3,8,0.9);
+        border-radius: 12px;
+        padding: 14px 12px;
+        border: 1px solid rgba(255,255,255,0.04);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .panel-body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            120deg,
+            rgba(0,245,255,0.08),
+            transparent 40%,
+            rgba(255,0,255,0.08)
+        );
+        mix-blend-mode: soft-light;
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .log-line {
+        position: relative;
+        z-index: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .log-prefix {
+        color: #5555ff;
+    }
+
+    .log-tag {
+        color: #00ff9d;
+    }
+
+    .log-muted {
+        color: #666688;
+    }
+
+    .log-accent {
+        color: #00f5ff;
+    }
+
+    .log-warn {
+        color: #ffcc55;
+    }
+
+    .log-strong {
+        color: #ff66ff;
+    }
+
+    .section {
+        margin-top: 40px;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+    }
+
+    .section-heading {
+        font-size: 1.4rem;
+        margin-bottom: 18px;
+    }
+
+    .section-heading span {
+        color: var(--accent);
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .card {
+        border-radius: 14px;
+        border: 1px solid var(--border-soft);
+        background: var(--bg-alt);
+        padding: 16px 16px 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top, rgba(0,245,255,0.12), transparent 60%);
+        opacity: 0;
+        transition: 0.3s ease;
+    }
+
+    .card:hover::before {
+        opacity: 1;
+    }
+
+    .card-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+        margin-bottom: 8px;
+    }
+
+    .card-title {
+        font-size: 0.98rem;
+        margin-bottom: 8px;
+    }
+
+    .card-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        padding: 4px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--border-soft);
+        color: var(--text-muted);
+        background: rgba(5,5,12,0.9);
+    }
+
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--accent);
+    }
+
+    footer {
+        border-top: 1px solid var(--border-soft);
+        padding: 18px 7vw 20px;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: rgba(5,5,12,0.96);
+        backdrop-filter: blur(10px);
+    }
+
+    .footer-right {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .footer-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.78rem;
+    }
+
+    .footer-link:hover {
+        color: var(--accent);
+    }
+
+    /* Glitch title effect (subtle) */
+    .glitch {
+        position: relative;
+        display: inline-block;
+    }
+
+    .glitch::before,
+    .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0.18;
+        mix-blend-mode: screen;
+        pointer-events: none;
+    }
+
+    .glitch::before {
+        transform: translateX(-1px);
+        color: #00f5ff;
+    }
+
+    .glitch::after {
+        transform: translateX(1px);
+        color: #ff00ff;
+    }
+
+    @keyframes subtle-glitch {
+        0%, 92%, 100% { transform: translate(0,0); }
+        94% { transform: translate(-1px, 0); }
+        96% { transform: translate(1px, 0); }
+        98% { transform: translate(0,0); }
+    }
+
+    .glitch {
+        animation: subtle-glitch 4.5s infinite;
+    }
+
+    /* Small pulse on primary button */
+    @keyframes pulse-btn {
+        0% { box-shadow: 0 0 18px rgba(0,245,255,0.6), 0 0 32px rgba(255,0,255,0.4); }
+        50% { box-shadow: 0 0 26px rgba(0,245,255,0.9), 0 0 40px rgba(255,0,255,0.7); }
+        100% { box-shadow: 0 0 18px rgba(0,245,255,0.6), 0 0 32px rgba(255,0,255,0.4); }
+    }
+
+    .btn-primary {
+        animation: pulse-btn 3.4s infinite;
+    }
+</style>
+</head>
+<body>
+
+<div class="bg-orbit"></div>
+<div class="scanline"></div>
+
+<header>
+    <div class="brand">
+        <div class="brand-mark"></div>
+        <div>
+            <div class="brand-text-main">99 NUITS</div>
+            <div class="brand-text-sub">Outil officiel</div>
+        </div>
+    </div>
+    <div class="nav-pill">
+        <div class="nav-dot"></div>
+        Build stable • v1.0
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="hero-left">
+            <div class="hero-kicker">Suite logicielle 99 Nuits</div>
+            <h1 class="hero-title">
+                <span class="glitch" data-text="99 Nuits">99 Nuits</span><br>
+                Outil officiel pour sessions nocturnes.
+            </h1>
+            <p class="hero-subtitle">
+                Une exécution unique, un environnement maîtrisé, une expérience pensée pour les utilisateurs qui veulent
+                un outil propre, compact et prêt à l’emploi. Distribué exclusivement via cette page officielle.
+            </p>
+
+            <div class="hero-meta">
+                <div class="meta-pill">
+                    <span class="meta-dot"></span>
+                    Build signé interne
+                </div>
+                <div class="meta-pill">
+                    <span class="meta-dot"></span>
+                    Binaire autonome (.exe)
+                </div>
+                <div class="meta-pill">
+                    <span class="meta-dot"></span>
+                    Distribution : branche main
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <!-- IMPORTANT : le fichier doit s’appeler Cheat99Nuits.exe dans la même branche -->
+                <a class="btn-primary" href="Cheat99Nuits.exe" download>
+                    <span class="icon">⬇</span>
+                    <span>Télécharger 99 Nuits</span>
+                </a>
+
+                <a class="btn-ghost" href="#details">
+                    <span class="btn-ghost-dot"></span>
+                    Détails de la version
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-dots">
+                        <div class="panel-dot"></div>
+                        <div class="panel-dot"></div>
+                        <div class="panel-dot"></div>
+                    </div>
+                    <div class="panel-title">99NUITS.EXE • SESSION LOG</div>
+                </div>
+                <div class="panel-body" id="log-panel">
+                    <div class="log-line">
+                        <span class="log-prefix">[00:00:00]</span>
+                        <span class="log-muted"> Initialisation du module </span>
+                        <span class="log-tag">CORE</span>
+                        <span class="log-muted">…</span>
+                    </div>
+                    <div class="log-line">
+                        <span class="log-prefix">[00:00:01]</span>
+                        <span class="log-accent"> Chargement du binaire officiel </span>
+                        <span class="log-muted">(branche main)</span>
+                    </div>
+                    <div class="log-line">
+                        <span class="log-prefix">[00:00:02]</span>
+                        <span class="log-muted"> Vérification de l’intégrité :</span>
+                        <span class="log-strong"> OK</span>
+                    </div>
+                    <div class="log-line">
+                        <span class="log-prefix">[00:00:03]</span>
+                        <span class="log-muted"> Mode exécution :</span>
+                        <span class="log-tag">Standalone</span>
+                    </div>
+                    <div class="log-line">
+                        <span class="log-prefix">[00:00:04]</span>
+                        <span class="log-warn"> En attente de lancement utilisateur…</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="details" class="section">
+        <div class="section-title">Détails</div>
+        <div class="section-heading">Conçu comme un <span>outil unique</span>, pensé pour la nuit.</div>
+
+        <div class="grid">
+            <article class="card">
+                <div class="card-label">Distribution</div>
+                <div class="card-title">Binaire autonome</div>
+                <p class="card-text">
+                    99 Nuits est fourni sous la forme d’un exécutable unique. Aucun installateur complexe, aucun
+                    prérequis externe : un seul fichier, une seule action.
+                </p>
+            </article>
+
+            <article class="card">
+                <div class="card-label">Expérience</div>
+                <div class="card-title">Pensé pour les sessions prolongées</div>
+                <p class="card-text">
+                    L’outil est optimisé pour rester discret, stable et fluide. Idéal pour les environnements nocturnes,
+                    les postes dédiés ou les setups minimalistes.
+                </p>
+            </article>
+
+            <article class="card">
+                <div class="card-label">Source</div>
+                <div class="card-title">Branche principale</div>
+                <p class="card-text">
+                    Cette page distribue exclusivement la version référencée comme stable sur la branche principale.
+                    Toute autre source doit être considérée comme non officielle.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-title">Notes de version</div>
+        <div class="section-heading">Version <span>1.0</span> — première édition officielle.</div>
+
+        <div class="card">
+            <div class="card-label">Journal</div>
+            <div class="card-title">Changements principaux</div>
+            <p class="card-text" style="margin-bottom: 10px;">
+                • Première release publique de 99 Nuits.<br>
+                • Binaire autonome compilé et vérifié.<br>
+                • Optimisations internes pour une exécution plus fluide.<br>
+                • Ajustements visuels et cohérence de l’identité 99 Nuits.
+            </p>
+            <span class="badge">
+                <span class="badge-dot"></span>
+                Dernière mise à jour : 2026
+            </span>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div>© 2026 — 99 Nuits. Outil officiel. Tous droits réservés.</div>
+    <div class="footer-right">
+        <a class="footer-link" href="#details">Détails</a>
+        <a class="footer-link" href="#">Conditions d’utilisation</a>
+        <a class="footer-link" href="#">Mentions</a>
+    </div>
+</footer>
+
+<script>
+    // Petit effet de log "vivant" sans dépendance externe
+    (function() {
+        const logPanel = document.getElementById("log-panel");
+        if (!logPanel) return;
+
+        const baseLines = [
+            "[00:00:05] Initialisation du contexte nocturne…",
+            "[00:00:06] Synchronisation avec la configuration locale… OK",
+            "[00:00:07] Préparation du binaire pour exécution utilisateur…",
+            "[00:00:08] Statut : prêt. En attente d’action.",
+        ];
+
+        let index = 0;
+        setInterval(() => {
+            if (index >= baseLines.length) return;
+            const line = document.createElement("div");
+            line.className = "log-line";
+            const raw = baseLines[index++];
+
+            const prefixMatch = raw.match(/^
+
+\[(.*?)\]
+
+/);
+            const prefix = prefixMatch ? prefixMatch[0] : "";
+            const rest = raw.replace(prefix, "").trim();
+
+            const spanPrefix = document.createElement("span");
+            spanPrefix.className = "log-prefix";
+            spanPrefix.textContent = prefix + " ";
+
+            const spanText = document.createElement("span");
+            spanText.className = "log-muted";
+            spanText.textContent = rest;
+
+            line.appendChild(spanPrefix);
+            line.appendChild(spanText);
+            logPanel.appendChild(line);
+
+            logPanel.scrollTop = logPanel.scrollHeight;
+        }, 1400);
+    })();
+</script>
+
+</body>
+</html>
